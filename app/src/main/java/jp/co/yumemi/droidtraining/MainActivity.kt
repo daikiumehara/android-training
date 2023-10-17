@@ -3,11 +3,8 @@ package jp.co.yumemi.droidtraining
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
@@ -19,11 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,16 +41,14 @@ fun MainContent() {
             constraintSet = mainViewConstraints(),
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            WeatherInfoView(
+                weather = weather,
+                maxTemp = 10,
+                minTemp = 5,
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
-                    .layoutId("weatherView")
-            ) {
-                WeatherImage(weather.value)
-
-                TempLabels(maxTemp = 10, minTemp = 5)
-            }
+                    .layoutId("weatherInfoView")
+            )
 
             ActionButtons(
                 reloadAction = {
@@ -67,38 +59,6 @@ fun MainContent() {
         }
 }
 
-@Composable
-fun WeatherImage(id: Int) {
-    Image(
-        painter = painterResource(id = id),
-        contentDescription = null,
-        Modifier
-            .aspectRatio(1f)
-    )
-}
-
-@Composable
-fun TempLabels(maxTemp: Int, minTemp: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(1f)
-    ) {
-        Text(
-            maxTemp.toString(),
-            color = Color.Red,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .weight(1f)
-        )
-
-        Text(
-            minTemp.toString(),
-            color = Color.Blue,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .weight(1f)
-        )
-    }
-}
 
 
 @Composable
@@ -141,7 +101,7 @@ fun ActionButtons(reloadAction: () -> Unit, nextAction: () -> Unit) {
 
 fun mainViewConstraints(): ConstraintSet {
     return ConstraintSet {
-        val weatherView = createRefFor("weatherView")
+        val weatherView = createRefFor("weatherInfoView")
         val actionButtons = createRefFor("actionButtons")
 
         constrain(weatherView) {
