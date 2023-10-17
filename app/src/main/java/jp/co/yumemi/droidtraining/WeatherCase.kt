@@ -10,11 +10,12 @@ enum class WeatherCase(val value: Int) {
 class WeatherCaseConvertor() {
     companion object {
         fun convert(weatherString: String): WeatherCase {
+            println(weatherString)
             return when (weatherString) {
-                "Sunny" -> WeatherCase.SUNNY
-                "Cloudy" -> WeatherCase.CLOUDY
-                "Rainy" -> WeatherCase.RAINY
-                "Snow" -> WeatherCase.SNOW
+                "sunny" -> WeatherCase.SUNNY
+                "cloudy" -> WeatherCase.CLOUDY
+                "rainy" -> WeatherCase.RAINY
+                "snow" -> WeatherCase.SNOW
                 else -> WeatherCase.SUNNY
             }
         }
