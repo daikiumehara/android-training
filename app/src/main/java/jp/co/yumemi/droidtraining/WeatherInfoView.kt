@@ -11,14 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun WeatherInfoView(
-    weather: WeatherCase,
-    maxTemp: Int,
-    minTemp: Int,
+    weatherInfo: WeatherInfo?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -26,7 +26,7 @@ fun WeatherInfoView(
         modifier = modifier
     ) {
         Image(
-            painter = painterResource(weather.value),
+            painter = painterResource(weatherInfo?.weatherCase?.value ?: R.drawable.baseline_question_mark_24),
             contentDescription = null,
             Modifier
                 .aspectRatio(1f)
@@ -36,17 +36,21 @@ fun WeatherInfoView(
             modifier = Modifier.fillMaxWidth(1f)
         ) {
             Text(
-                maxTemp.toString(),
+                weatherInfo?.maxTemp?.toString() ?: "--",
                 color = Color.Red,
                 textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .weight(1f)
             )
 
             Text(
-                minTemp.toString(),
+                weatherInfo?.minTemp?.toString() ?: "--",
                 color = Color.Blue,
                 textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .weight(1f)
             )
@@ -57,23 +61,29 @@ fun WeatherInfoView(
 @Preview
 @Composable
 fun WeatherInfoView_Sunny_Preview() {
-    WeatherInfoView(weather = WeatherCase.SUNNY, maxTemp = 10, minTemp = 0)
+    WeatherInfoView(WeatherInfo(weatherCase = WeatherCase.SUNNY, maxTemp = 10, minTemp = 0))
 }
 
 @Preview
 @Composable
 fun WeatherInfoView_Cloudy_Preview() {
-    WeatherInfoView(weather = WeatherCase.CLOUDY, maxTemp = 10, minTemp = 0)
+    WeatherInfoView(WeatherInfo(weatherCase = WeatherCase.CLOUDY, maxTemp = 10, minTemp = 0))
 }
 
 @Preview
 @Composable
 fun WeatherInfoView_Rainy_Preview() {
-    WeatherInfoView(weather = WeatherCase.RAINY, maxTemp = 10, minTemp = 0)
+    WeatherInfoView(WeatherInfo(weatherCase = WeatherCase.RAINY, maxTemp = 10, minTemp = 0))
 }
 
 @Preview
 @Composable
 fun WeatherInfoView_Snow_Preview() {
-    WeatherInfoView(weather = WeatherCase.SNOW, maxTemp = 10, minTemp = 0)
+    WeatherInfoView(WeatherInfo(weatherCase = WeatherCase.SNOW, maxTemp = 10, minTemp = 0))
+}
+
+@Preview
+@Composable
+fun WeatherInfoView_None_Preview() {
+    WeatherInfoView(weatherInfo = null)
 }
