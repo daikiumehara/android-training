@@ -3,10 +3,15 @@ package jp.co.yumemi.droidtraining
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,30 +42,45 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainContent() {
     val weatherClient = WeatherAPIClientImpl(context = LocalContext.current)
-    var weather: WeatherCase by remember { mutableStateOf(WeatherCase.SUNNY) }
-        ConstraintLayout(
-            constraintSet = mainViewConstraints(),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            WeatherInfoView(
-                weather = weather,
-                maxTemp = 10,
-                minTemp = 5,
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .layoutId("weatherInfoView")
-            )
+    var weatherState: WeatherState by remember { mutableStateOf(WeatherState(null, null)) }
 
-            ActionButtons(
-                reloadAction = {
-                    weather = weatherClient.fetchWeather()
-                },
-                nextAction = {}
+    fun reloadAction(): Unit {
+        val (info, error) = weatherClient.fetchWeather()
+        val state = WeatherState(info ?: weatherState.info, error)
+        weatherState = state
+    }
+
+    fun closeAction(): Unit {
+        weatherState = WeatherState(weatherState.info, null)
+    }
+
+    ConstraintLayout(
+        constraintSet = mainViewConstraints(),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        WeatherInfoView(
+            weatherInfo = weatherState.info,
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .layoutId("weatherInfoView")
+        )
+
+        ActionButtons(
+            reloadAction = ::reloadAction,
+            nextAction = {}
+        )
+    }
+
+    when {
+        weatherState.error != null -> {
+            ErrorDialog(
+                description = weatherState.error!!,
+                reloadAction = ::reloadAction,
+                closeAction = ::closeAction
             )
         }
+    }
 }
-
-
 
 @Composable
 fun ActionButtons(reloadAction: () -> Unit, nextAction: () -> Unit) {
@@ -96,6 +117,45 @@ fun ActionButtons(reloadAction: () -> Unit, nextAction: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun ErrorDialog(
+    description: String,
+    reloadAction: () -> Unit,
+    closeAction: () -> Unit
+) {
+    AlertDialog(
+        title = {
+            Text(
+                text = "エラー",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        },
+        text = { Text(description) },
+        onDismissRequest = {
+            closeAction()
+        },
+        buttons = {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .padding(horizontal = 16.dp),
+            ) {
+                Button(onClick = closeAction) {
+                    Text(text = "CLOSE")
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Button(onClick = reloadAction) {
+                    Text("RELOAD")
+                }
+            }
+        }
+    )
 }
 
 
